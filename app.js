@@ -4,7 +4,7 @@ const BASE_PLAN_OPTIONS = [
     name: "方案一",
     amountLabel: "NT$5,000",
     suggestedAmount: 5000,
-    benefits: ["貴賓票券 4 張", "公司標誌 + 公司名稱放置於電子節目冊芳名錄"],
+    benefits: ["貴賓票券 4 張", "公司LOGO + 公司名稱放置於電子節目冊芳名錄"],
   },
   {
     id: "plan-2",
@@ -13,8 +13,8 @@ const BASE_PLAN_OPTIONS = [
     suggestedAmount: 10000,
     benefits: [
       "貴賓票券 8 張",
-      "公司標誌 + 公司名稱放置於電子節目冊 1/2 版面形象頁",
-      "公司標誌 + 公司名稱放置於貴賓小卡（電子 + 紙本）",
+      "公司LOGO + 公司名稱放置於電子節目冊 1/2 版面形象頁",
+      "公司LOGO + 公司名稱放置於貴賓小卡（電子 + 紙本）",
     ],
   },
   {
@@ -24,8 +24,8 @@ const BASE_PLAN_OPTIONS = [
     suggestedAmount: 20000,
     benefits: [
       "貴賓票券 20 張",
-      "公司標誌 + 公司名稱放置於電子節目冊滿版形象頁",
-      "公司標誌 + 公司名稱放置於貴賓小卡（電子 + 紙本）",
+      "公司LOGO + 公司名稱放置於電子節目冊滿版形象頁",
+      "公司LOGO + 公司名稱放置於貴賓小卡（電子 + 紙本）",
       "官方社群感謝文",
     ],
   },
@@ -49,9 +49,8 @@ const PLAN_FOUR = {
 };
 
 const FLEXIBLE_AMOUNT_PLAN_ID = "plan-3";
-const FLEXIBLE_AMOUNT_DEFAULT = String(
-  BASE_PLAN_OPTIONS.find((plan) => plan.id === FLEXIBLE_AMOUNT_PLAN_ID)?.suggestedAmount || 20000,
-);
+const FLEXIBLE_AMOUNT_MIN = BASE_PLAN_OPTIONS.find((plan) => plan.id === FLEXIBLE_AMOUNT_PLAN_ID)?.suggestedAmount || 20000;
+const FLEXIBLE_AMOUNT_DEFAULT = String(FLEXIBLE_AMOUNT_MIN);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{8,9}$/;
 const TAX_ID_REGEX = /^\d{8}$/;
@@ -145,7 +144,12 @@ function renderBasePlans() {
         <span class="plan-card__eyebrow">${plan.name}</span>
         <strong class="plan-card__amount">${plan.amountLabel}</strong>
         <ul class="plan-card__list">
-          ${plan.benefits.map((benefit) => `<li>${benefit}</li>`).join("")}
+          ${plan.benefits
+            .map(
+              (benefit) =>
+                `<li class="${benefit === "購買 15 張（含）以上優惠票，音樂會票券八折優惠" ? "plan-card__list-item--plain" : ""}">${benefit}</li>`,
+            )
+            .join("")}
         </ul>
         ${
           plan.id === FLEXIBLE_AMOUNT_PLAN_ID
@@ -207,12 +211,12 @@ function updatePlanUI() {
 
   if (basePlanCustomAmountField) {
     basePlanCustomAmountField.value = planThreeCustomAmount;
-    basePlanCustomAmountField.placeholder = `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上金額`;
+    basePlanCustomAmountField.placeholder = `請填寫 ${formatCurrency(FLEXIBLE_AMOUNT_MIN)} 以上贊助金額`;
   }
   if (planThreeAmountHint) {
     planThreeAmountHint.textContent = pricing.hasPlanFour
-      ? `主方案金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}，本次總金額會自動再加上優惠票金額。`
-      : `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上主方案金額。`;
+      ? `贊助金額不得低於 ${formatCurrency(FLEXIBLE_AMOUNT_MIN)}，本次總金額會自動再加上優惠票金額。`
+      : `請填寫 ${formatCurrency(FLEXIBLE_AMOUNT_MIN)} 以上贊助金額。`;
   }
   donationAmountField.readOnly = true;
   donationAmountField.placeholder = "系統會自動計算本次總金額";
@@ -323,7 +327,7 @@ async function handleSubmit(event) {
   }
 
   if (pricing.isFlexibleAmount && pricing.basePlanAmount < basePlan.suggestedAmount) {
-    setStatus(`方案三金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}。`, "error");
+    setStatus(`贊助金額不得低於 ${formatCurrency(FLEXIBLE_AMOUNT_MIN)}。`, "error");
     dom.form.elements.basePlanCustomAmount.focus();
     return;
   }

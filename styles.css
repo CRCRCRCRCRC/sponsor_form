@@ -413,6 +413,11 @@ textarea {
   margin-top: 6px;
 }
 
+.plan-card__list-item--plain {
+  list-style: none;
+  margin-left: -18px;
+}
+
 .plan-card__custom {
   position: relative;
   z-index: 1;
@@ -507,6 +512,11 @@ textarea {
   margin: 0;
   padding-left: 18px;
   color: var(--muted);
+}
+
+.addon-card__list-item--plain {
+  list-style: none;
+  margin-left: -18px;
 }
 
 .plan-totals {
