@@ -739,6 +739,10 @@ textarea {
     padding: 20px 0 40px;
   }
 
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero,
   .form-card,
   .records-card {
@@ -767,7 +771,19 @@ textarea {
   }
 
   .info-rail {
-    grid-template-columns: 1fr;
+    display: contents;
+  }
+
+  .info-card--story {
+    order: 1;
+  }
+
+  .content-stack {
+    order: 2;
+  }
+
+  .info-rail > .info-card:not(.info-card--story) {
+    order: 3;
   }
 
   .field-grid,

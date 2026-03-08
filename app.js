@@ -52,8 +52,6 @@ const FLEXIBLE_AMOUNT_PLAN_ID = "plan-3";
 const FLEXIBLE_AMOUNT_MIN = BASE_PLAN_OPTIONS.find((plan) => plan.id === FLEXIBLE_AMOUNT_PLAN_ID)?.suggestedAmount || 20000;
 const FLEXIBLE_AMOUNT_DEFAULT = String(FLEXIBLE_AMOUNT_MIN);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^0\d{8,9}$/;
-const TAX_ID_REGEX = /^\d{8}$/;
 const TRANSFER_LAST_FIVE_REGEX = /^\d{5}$/;
 
 const dom = {};
@@ -121,7 +119,7 @@ function bindEvents() {
     dom.form.elements[name].addEventListener("input", updatePlanUI);
   }
 
-  for (const [name, maxLength] of [["taxId", 8], ["contactPhone", 10], ["transferLast5", 5]]) {
+  for (const [name, maxLength] of [["transferLast5", 5]]) {
     dom.form.elements[name].addEventListener("input", (event) => {
       const target = event.target;
       if (target instanceof HTMLInputElement) {
@@ -284,8 +282,8 @@ async function handleSubmit(event) {
   const donorName = String(formData.get("donorName") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const basePlanCustomAmount = sanitizeNumericValue(formData.get("basePlanCustomAmount"));
-  const taxId = sanitizeNumericValue(formData.get("taxId"), 8);
-  const contactPhone = sanitizeNumericValue(formData.get("contactPhone"), 10);
+  const taxId = String(formData.get("taxId") || "").trim();
+  const contactPhone = String(formData.get("contactPhone") || "").trim();
   const transferLast5 = sanitizeNumericValue(formData.get("transferLast5"), 5);
   const pricing = getPlanPricing(basePlan, basePlanCustomAmount);
   const donationAmount = pricing.displayTotalAmount;
@@ -329,18 +327,6 @@ async function handleSubmit(event) {
   if (pricing.isFlexibleAmount && pricing.basePlanAmount < basePlan.suggestedAmount) {
     setStatus(`贊助金額不得低於 ${formatCurrency(FLEXIBLE_AMOUNT_MIN)}。`, "error");
     dom.form.elements.basePlanCustomAmount.focus();
-    return;
-  }
-
-  if (!PHONE_REGEX.test(contactPhone)) {
-    setStatus("連絡電話請填寫正確格式，例如 0912345678。", "error");
-    dom.form.elements.contactPhone.focus();
-    return;
-  }
-
-  if (taxId && !TAX_ID_REGEX.test(taxId)) {
-    setStatus("身份統一編號請填寫 8 碼數字。", "error");
-    dom.form.elements.taxId.focus();
     return;
   }
 
