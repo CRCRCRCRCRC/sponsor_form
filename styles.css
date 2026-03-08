@@ -104,8 +104,9 @@ a {
 }
 
 .hero h1 {
-  max-width: 10ch;
-  font-size: clamp(2.4rem, 4vw, 4.3rem);
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(1.55rem, 4vw, 4.3rem);
 }
 
 .hero__lede {
@@ -353,11 +354,6 @@ textarea {
     serif;
   font-size: 2rem;
   line-height: 1.1;
-}
-
-.plan-card__summary {
-  margin: 0;
-  color: var(--muted);
 }
 
 .plan-card__list {
@@ -683,8 +679,7 @@ textarea {
   }
 
   .hero h1 {
-    max-width: none;
-    font-size: clamp(2rem, 11vw, 3rem);
+    font-size: clamp(1.3rem, 5.8vw, 3rem);
   }
 
   .hero__lede {

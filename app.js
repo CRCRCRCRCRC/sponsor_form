@@ -4,7 +4,6 @@ const BASE_PLAN_OPTIONS = [
     name: "方案一",
     amountLabel: "NT$5,000",
     suggestedAmount: 5000,
-    summary: "貴賓票券 4 張，電子節目冊芳名錄",
     benefits: ["貴賓票券 4 張", "公司標誌 + 公司名稱放置於電子節目冊芳名錄"],
   },
   {
@@ -12,7 +11,6 @@ const BASE_PLAN_OPTIONS = [
     name: "方案二",
     amountLabel: "NT$10,000",
     suggestedAmount: 10000,
-    summary: "貴賓票券 8 張，1/2 版形象頁，貴賓小卡",
     benefits: [
       "貴賓票券 8 張",
       "公司標誌 + 公司名稱放置於電子節目冊 1/2 版面形象頁",
@@ -24,7 +22,6 @@ const BASE_PLAN_OPTIONS = [
     name: "方案三",
     amountLabel: "NT$20,000（含）以上",
     suggestedAmount: 20000,
-    summary: "貴賓票券 20 張，滿版形象頁，官方社群感謝文",
     benefits: [
       "貴賓票券 20 張",
       "公司標誌 + 公司名稱放置於電子節目冊滿版形象頁",
@@ -37,7 +34,6 @@ const BASE_PLAN_OPTIONS = [
     name: "方案四",
     amountLabel: "依票張計算",
     suggestedAmount: 0,
-    summary: "優惠票 15 張（含）以上，依票種張數自動加總",
     benefits: [
       "可單選方案四",
       "320 元（原 400 元）",
@@ -50,7 +46,6 @@ const BASE_PLAN_OPTIONS = [
 const PLAN_FOUR = {
   id: "plan-4",
   name: "方案四",
-  summary: "優惠票 15 張（含）以上，依票種張數自動加總",
 };
 
 const FLEXIBLE_AMOUNT_PLAN_ID = "plan-3";
@@ -80,6 +75,7 @@ function cacheDom() {
   dom.form = document.querySelector("#sponsorForm");
   dom.planSelector = document.querySelector("#planSelector");
   dom.planHint = document.querySelector("#planHint");
+  dom.addonSection = document.querySelector("#addonSection");
   dom.addPlanFour = document.querySelector("#addPlanFour");
   dom.planFourCard = document.querySelector("#planFourCard");
   dom.ticketBuilder = document.querySelector("#ticketBuilder");
@@ -148,7 +144,6 @@ function renderBasePlans() {
         } />
         <span class="plan-card__eyebrow">${plan.name}</span>
         <strong class="plan-card__amount">${plan.amountLabel}</strong>
-        <p class="plan-card__summary">${plan.summary}</p>
         <ul class="plan-card__list">
           ${plan.benefits.map((benefit) => `<li>${benefit}</li>`).join("")}
         </ul>
@@ -194,6 +189,7 @@ function updatePlanUI() {
     includePlanFour = false;
   }
 
+  dom.addonSection.hidden = isPlanFourPrimary;
   dom.addPlanFour.checked = includePlanFour;
   dom.addPlanFour.disabled = isPlanFourPrimary;
   dom.planFourCard.classList.toggle("is-selected", includePlanFour);
