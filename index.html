@@ -181,28 +181,30 @@
                   />
                 </div>
 
-                <div class="field" id="planThreeAmountField" hidden>
-                  <label for="basePlanCustomAmount">方案三金額</label>
-                  <input
-                    id="basePlanCustomAmount"
-                    name="basePlanCustomAmount"
-                    type="text"
-                    inputmode="numeric"
-                    placeholder="請填寫 NT$20,000 以上金額"
-                  />
-                  <p class="field__hint" id="planThreeAmountHint">僅方案三使用。</p>
-                </div>
+                <div class="amount-field-grid field--full" id="amountFieldGrid">
+                  <div class="field amount-field-grid__item" id="planThreeAmountField" hidden>
+                    <label for="basePlanCustomAmount">方案三金額</label>
+                    <input
+                      id="basePlanCustomAmount"
+                      name="basePlanCustomAmount"
+                      type="text"
+                      inputmode="numeric"
+                      placeholder="請填寫 NT$20,000 以上金額"
+                    />
+                    <p class="field__hint" id="planThreeAmountHint">僅方案三使用。</p>
+                  </div>
 
-                <div class="field">
-                  <label for="donationAmount">本次總金額</label>
-                  <input
-                    id="donationAmount"
-                    name="donationAmount"
-                    type="text"
-                    inputmode="numeric"
-                    placeholder="系統會自動計算本次總金額"
-                    readonly
-                  />
+                  <div class="field amount-field-grid__item amount-field-grid__item--total" id="donationAmountField">
+                    <label for="donationAmount">本次總金額</label>
+                    <input
+                      id="donationAmount"
+                      name="donationAmount"
+                      type="text"
+                      inputmode="numeric"
+                      placeholder="系統會自動計算本次總金額"
+                      readonly
+                    />
+                  </div>
                 </div>
 
                 <div class="field">

@@ -248,6 +248,25 @@ a {
   grid-column: 1 / -1;
 }
 
+.amount-field-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.amount-field-grid.has-plan-three {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.amount-field-grid__item--total {
+  grid-column: 1 / -1;
+}
+
+.amount-field-grid.has-plan-three .amount-field-grid__item--total {
+  grid-column: auto;
+}
+
 .field label,
 .field__label {
   font-weight: 700;
@@ -679,7 +698,8 @@ textarea {
   }
 
   .field-grid,
-  .ticket-builder {
+  .ticket-builder,
+  .amount-field-grid {
     grid-template-columns: 1fr;
   }
 

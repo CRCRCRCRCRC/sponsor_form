@@ -80,8 +80,10 @@ function cacheDom() {
   dom.planFourCard = document.querySelector("#planFourCard");
   dom.ticketBuilder = document.querySelector("#ticketBuilder");
   dom.ticketSummary = document.querySelector("#ticketSummary");
+  dom.amountFieldGrid = document.querySelector("#amountFieldGrid");
   dom.planThreeAmountField = document.querySelector("#planThreeAmountField");
   dom.planThreeAmountHint = document.querySelector("#planThreeAmountHint");
+  dom.donationAmountField = document.querySelector("#donationAmountField");
   dom.comboNameValue = document.querySelector("#comboNameValue");
   dom.baseAmountValue = document.querySelector("#baseAmountValue");
   dom.planFourAmountValue = document.querySelector("#planFourAmountValue");
@@ -173,6 +175,7 @@ function updatePlanUI() {
   dom.planFourCard.classList.toggle("is-disabled", isPlanFourPrimary);
   dom.ticketBuilder.classList.toggle("is-hidden", !shouldUsePlanFour(basePlan));
   dom.planThreeAmountField.hidden = !isFlexibleAmount;
+  dom.amountFieldGrid.classList.toggle("has-plan-three", isFlexibleAmount);
 
   if (isFlexibleAmount && !wasFlexibleAmountPlan && parseAmount(basePlanCustomAmountField.value) === 0) {
     basePlanCustomAmountField.value = String(basePlan.suggestedAmount);
