@@ -248,25 +248,6 @@ a {
   grid-column: 1 / -1;
 }
 
-.amount-field-grid {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-}
-
-.amount-field-grid.has-plan-three {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.amount-field-grid__item--total {
-  grid-column: 1 / -1;
-}
-
-.amount-field-grid.has-plan-three .amount-field-grid__item--total {
-  grid-column: auto;
-}
-
 .field label,
 .field__label {
   font-weight: 700;
@@ -354,6 +335,7 @@ textarea {
   opacity: 0;
   inset: 0;
   cursor: pointer;
+  pointer-events: none;
 }
 
 .plan-card__eyebrow {
@@ -386,6 +368,30 @@ textarea {
 
 .plan-card__list li + li {
   margin-top: 6px;
+}
+
+.plan-card__custom {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(35, 71, 61, 0.18);
+}
+
+.plan-card__custom-label {
+  font-weight: 700;
+}
+
+.plan-card__custom-input {
+  pointer-events: auto;
+}
+
+.plan-card__custom-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .addon-card {
@@ -698,8 +704,7 @@ textarea {
   }
 
   .field-grid,
-  .ticket-builder,
-  .amount-field-grid {
+  .ticket-builder {
     grid-template-columns: 1fr;
   }
 

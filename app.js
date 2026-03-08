@@ -54,6 +54,9 @@ const PLAN_FOUR = {
 };
 
 const FLEXIBLE_AMOUNT_PLAN_ID = "plan-3";
+const FLEXIBLE_AMOUNT_DEFAULT = String(
+  BASE_PLAN_OPTIONS.find((plan) => plan.id === FLEXIBLE_AMOUNT_PLAN_ID)?.suggestedAmount || 20000,
+);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{8,9}$/;
 const TAX_ID_REGEX = /^\d{8}$/;
@@ -64,6 +67,7 @@ let selectedBasePlanId = BASE_PLAN_OPTIONS[0].id;
 let includePlanFour = false;
 let skipResetCleanup = false;
 let wasFlexibleAmountPlan = false;
+let planThreeCustomAmount = FLEXIBLE_AMOUNT_DEFAULT;
 
 document.addEventListener("DOMContentLoaded", () => {
   cacheDom();
@@ -80,10 +84,6 @@ function cacheDom() {
   dom.planFourCard = document.querySelector("#planFourCard");
   dom.ticketBuilder = document.querySelector("#ticketBuilder");
   dom.ticketSummary = document.querySelector("#ticketSummary");
-  dom.amountFieldGrid = document.querySelector("#amountFieldGrid");
-  dom.planThreeAmountField = document.querySelector("#planThreeAmountField");
-  dom.planThreeAmountHint = document.querySelector("#planThreeAmountHint");
-  dom.donationAmountField = document.querySelector("#donationAmountField");
   dom.comboNameValue = document.querySelector("#comboNameValue");
   dom.baseAmountValue = document.querySelector("#baseAmountValue");
   dom.planFourAmountValue = document.querySelector("#planFourAmountValue");
@@ -105,6 +105,18 @@ function bindEvents() {
     }
   });
 
+  dom.planSelector.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
+    if (target.name === "basePlanCustomAmount") {
+      target.value = sanitizeNumericValue(target.value);
+      planThreeCustomAmount = target.value;
+      updatePlanUI();
+    }
+  });
+
   dom.addPlanFour.addEventListener("change", () => {
     includePlanFour = dom.addPlanFour.checked;
     updatePlanUI();
@@ -113,14 +125,6 @@ function bindEvents() {
   for (const name of ["ticket320", "ticket480", "ticket640"]) {
     dom.form.elements[name].addEventListener("input", updatePlanUI);
   }
-
-  dom.form.elements.basePlanCustomAmount.addEventListener("input", (event) => {
-    const target = event.target;
-    if (target instanceof HTMLInputElement) {
-      target.value = sanitizeNumericValue(target.value);
-    }
-    updatePlanUI();
-  });
 
   for (const [name, maxLength] of [["taxId", 8], ["contactPhone", 10], ["transferLast5", 5]]) {
     dom.form.elements[name].addEventListener("input", (event) => {
@@ -148,6 +152,25 @@ function renderBasePlans() {
         <ul class="plan-card__list">
           ${plan.benefits.map((benefit) => `<li>${benefit}</li>`).join("")}
         </ul>
+        ${
+          plan.id === FLEXIBLE_AMOUNT_PLAN_ID
+            ? `
+              <div class="plan-card__custom" data-plan-three-field ${selectedBasePlanId === plan.id ? "" : "hidden"}>
+                <span class="plan-card__custom-label">方案三金額</span>
+                <input
+                  class="plan-card__custom-input"
+                  id="basePlanCustomAmount"
+                  name="basePlanCustomAmount"
+                  type="text"
+                  inputmode="numeric"
+                  value="${escapeHtml(planThreeCustomAmount)}"
+                  placeholder="請填寫 NT$20,000 以上金額"
+                />
+                <p class="plan-card__custom-hint" id="planThreeAmountHint">僅方案三使用。</p>
+              </div>
+            `
+            : ""
+        }
       </label>
     `,
   ).join("");
@@ -156,10 +179,12 @@ function renderBasePlans() {
 function updatePlanUI() {
   const basePlan = getBasePlan(selectedBasePlanId);
   const donationAmountField = dom.form.elements.donationAmount;
-  const basePlanCustomAmountField = dom.form.elements.basePlanCustomAmount;
   const isPlanFourPrimary = basePlan.id === PLAN_FOUR.id;
   const isFlexibleAmount = isFlexibleAmountPlan(basePlan);
   const cards = dom.planSelector.querySelectorAll("[data-plan-card]");
+  const planThreeAmountField = dom.planSelector.querySelector("[data-plan-three-field]");
+  const planThreeAmountHint = dom.planSelector.querySelector("#planThreeAmountHint");
+  const basePlanCustomAmountField = dom.form.elements.basePlanCustomAmount;
 
   for (const card of cards) {
     card.classList.toggle("is-selected", card.dataset.planCard === selectedBasePlanId);
@@ -174,22 +199,24 @@ function updatePlanUI() {
   dom.planFourCard.classList.toggle("is-selected", includePlanFour);
   dom.planFourCard.classList.toggle("is-disabled", isPlanFourPrimary);
   dom.ticketBuilder.classList.toggle("is-hidden", !shouldUsePlanFour(basePlan));
-  dom.planThreeAmountField.hidden = !isFlexibleAmount;
-  dom.amountFieldGrid.classList.toggle("has-plan-three", isFlexibleAmount);
-
-  if (isFlexibleAmount && !wasFlexibleAmountPlan && parseAmount(basePlanCustomAmountField.value) === 0) {
-    basePlanCustomAmountField.value = String(basePlan.suggestedAmount);
+  if (planThreeAmountField) {
+    planThreeAmountField.hidden = !isFlexibleAmount;
   }
 
-  const pricing = getPlanPricing(basePlan, basePlanCustomAmountField.value);
+  if (isFlexibleAmount && !wasFlexibleAmountPlan && parseAmount(planThreeCustomAmount) === 0) {
+    planThreeCustomAmount = FLEXIBLE_AMOUNT_DEFAULT;
+  }
 
-  basePlanCustomAmountField.placeholder = `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上金額`;
-  dom.planThreeAmountHint.textContent = pricing.hasPlanFour
-    ? `僅方案三使用。主方案金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}，本次總金額會自動再加上優惠票金額。`
-    : `僅方案三使用。請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上主方案金額。`;
+  const pricing = getPlanPricing(basePlan, planThreeCustomAmount);
 
-  if (!pricing.isFlexibleAmount) {
-    basePlanCustomAmountField.value = "";
+  if (basePlanCustomAmountField) {
+    basePlanCustomAmountField.value = planThreeCustomAmount;
+    basePlanCustomAmountField.placeholder = `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上金額`;
+  }
+  if (planThreeAmountHint) {
+    planThreeAmountHint.textContent = pricing.hasPlanFour
+      ? `主方案金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}，本次總金額會自動再加上優惠票金額。`
+      : `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上主方案金額。`;
   }
   donationAmountField.readOnly = true;
   donationAmountField.placeholder = "系統會自動計算本次總金額";
@@ -264,7 +291,7 @@ async function handleSubmit(event) {
   const donationAmount = pricing.displayTotalAmount;
 
   dom.form.elements.email.value = email;
-  dom.form.elements.basePlanCustomAmount.value = basePlanCustomAmount;
+  planThreeCustomAmount = basePlanCustomAmount || planThreeCustomAmount;
   dom.form.elements.taxId.value = taxId;
   dom.form.elements.contactPhone.value = contactPhone;
   dom.form.elements.transferLast5.value = transferLast5;
@@ -367,6 +394,7 @@ async function handleSubmit(event) {
     dom.form.reset();
     includePlanFour = false;
     selectedBasePlanId = BASE_PLAN_OPTIONS[0].id;
+    planThreeCustomAmount = FLEXIBLE_AMOUNT_DEFAULT;
     renderBasePlans();
     updatePlanUI();
     setStatus("提交成功，資料已寫入 Google 試算表。", "success");
@@ -387,6 +415,7 @@ function handleReset() {
     }
     selectedBasePlanId = BASE_PLAN_OPTIONS[0].id;
     includePlanFour = false;
+    planThreeCustomAmount = FLEXIBLE_AMOUNT_DEFAULT;
     renderBasePlans();
     updatePlanUI();
   });
@@ -589,6 +618,10 @@ function toInt(value) {
 
 function formatCurrency(value) {
   return `NT$${new Intl.NumberFormat("zh-TW").format(value || 0)}`;
+}
+
+function escapeHtml(value) {
+  return String(value || "").replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
 function setStatus(message, tone) {
