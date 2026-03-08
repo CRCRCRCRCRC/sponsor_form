@@ -54,6 +54,7 @@ const PLAN_FOUR = {
 };
 
 const FLEXIBLE_AMOUNT_PLAN_ID = "plan-3";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^0\d{8,9}$/;
 const TAX_ID_REGEX = /^\d{8}$/;
 const TRANSFER_LAST_FIVE_REGEX = /^\d{5}$/;
@@ -240,12 +241,14 @@ async function handleSubmit(event) {
   const formData = new FormData(dom.form);
   const basePlan = getBasePlan(formData.get("basePlan") || selectedBasePlanId);
   const donorName = String(formData.get("donorName") || "").trim();
+  const email = String(formData.get("email") || "").trim();
   const taxId = sanitizeNumericValue(formData.get("taxId"), 8);
   const contactPhone = sanitizeNumericValue(formData.get("contactPhone"), 10);
   const transferLast5 = sanitizeNumericValue(formData.get("transferLast5"), 5);
   const pricing = getPlanPricing(basePlan, formData.get("donationAmount"));
   const donationAmount = pricing.isFlexibleAmount ? parseAmount(formData.get("donationAmount")) : pricing.minimumRequiredAmount;
 
+  dom.form.elements.email.value = email;
   dom.form.elements.taxId.value = taxId;
   dom.form.elements.contactPhone.value = contactPhone;
   dom.form.elements.transferLast5.value = transferLast5;
@@ -259,6 +262,18 @@ async function handleSubmit(event) {
   if (!contactPhone) {
     setStatus("請填寫連絡電話。", "error");
     dom.form.elements.contactPhone.focus();
+    return;
+  }
+
+  if (!email) {
+    setStatus("請填寫電子郵件。", "error");
+    dom.form.elements.email.focus();
+    return;
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    setStatus("電子郵件格式不正確，請重新確認。", "error");
+    dom.form.elements.email.focus();
     return;
   }
 
@@ -302,6 +317,7 @@ async function handleSubmit(event) {
     formData,
     basePlan,
     donorName,
+    email,
     contactPhone,
     taxId,
     transferLast5,
@@ -348,6 +364,7 @@ function buildPayload(
   formData,
   basePlan,
   donorName,
+  email,
   contactPhone,
   taxId,
   transferLast5,
@@ -377,6 +394,7 @@ function buildPayload(
     totalDonationAmount: String(donationAmount),
     minimumRequiredAmount: String(minimumRequiredAmount),
     donorName,
+    email,
     taxId,
     receiptAddress: String(formData.get("receiptAddress") || "").trim(),
     contactPhone,
