@@ -86,6 +86,10 @@ a {
   text-transform: uppercase;
 }
 
+.hero__eyebrow {
+  font-size: 0.98rem;
+}
+
 .section-heading__eyebrow,
 .info-card__kicker {
   color: var(--accent);
@@ -346,6 +350,8 @@ textarea {
 .plan-card {
   position: relative;
   display: grid;
+  align-content: start;
+  grid-template-rows: auto minmax(2.6em, auto) 1fr auto;
   gap: 12px;
   padding: 20px;
   border: 1px solid var(--line);
@@ -386,18 +392,21 @@ textarea {
 }
 
 .plan-card__amount {
+  display: block;
   font-family:
     "Noto Serif TC",
     "PMingLiU",
     serif;
   font-size: 2rem;
   line-height: 1.1;
+  min-height: 2.6em;
 }
 
 .plan-card__list {
   margin: 0;
   padding-left: 18px;
   color: var(--muted);
+  align-self: start;
 }
 
 .plan-card__list li + li {
