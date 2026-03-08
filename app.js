@@ -35,7 +35,7 @@ const BASE_PLAN_OPTIONS = [
     amountLabel: "購票贊助",
     suggestedAmount: 0,
     benefits: [
-      "購買 15 張（含）以上優惠票，獲得八折優惠",
+      "購買 15 張（含）以上優惠票，音樂會票券八折優惠",
       "320 元（原 400 元）",
       "480 元（原 600 元）",
       "640 元（原 800 元）",
@@ -241,7 +241,7 @@ function updatePlanUI() {
 
 function buildTicketSummaryText(ticketSummary) {
   if (ticketSummary.totalTickets === 0) {
-    return "購買 15 張（含）以上優惠票，獲得八折優惠。";
+    return "購買 15 張（含）以上優惠票，音樂會票券八折優惠。";
   }
 
   return `方案四目前共 ${ticketSummary.totalTickets} 張，金額 ${formatCurrency(ticketSummary.totalAmount)}。${
