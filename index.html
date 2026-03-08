@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>企業贊助回函表單</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <div class="hero__content">
+          <p class="hero__eyebrow">企業贊助邀請函數位版</p>
+          <h1>清聲飛揚・竹科媽媽 從心出發</h1>
+          <p class="hero__lede">依照原始 PDF 內容整理成可填寫的網頁表單，提交後會直接寫入 Google 試算表。</p>
+        </div>
+
+        <aside class="hero__panel">
+          <div class="hero__panel-card">
+            <p class="panel__label">演出時間</p>
+            <p class="panel__value">2026 年 6 月 13 日 14:00</p>
+          </div>
+          <div class="hero__panel-card">
+            <p class="panel__label">演出地點</p>
+            <p class="panel__value">新竹縣文化局演藝廳</p>
+          </div>
+          <div class="hero__panel-card">
+            <p class="panel__label">合作單位</p>
+            <p class="panel__value">蛻變方成事</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="layout-grid">
+        <aside class="info-rail">
+          <article class="info-card">
+            <p class="info-card__kicker">匯款資訊</p>
+            <h2>贊助匯款及收據開立資訊</h2>
+            <dl class="info-list">
+              <div>
+                <dt>帳戶名稱</dt>
+                <dd>揚音樂集</dd>
+              </div>
+              <div>
+                <dt>銀行代碼名稱</dt>
+                <dd>012 台北富邦銀行竹北分行</dd>
+              </div>
+              <div>
+                <dt>帳號</dt>
+                <dd>746-102-00-6790</dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="info-card info-card--accent">
+            <p class="info-card__kicker">聯絡窗口</p>
+            <h2>揚音樂集</h2>
+            <p>吳小姐、賴小姐</p>
+            <p>
+              <a href="mailto:yangingirl@gmail.com">yangingirl@gmail.com</a>
+            </p>
+            <p>0918400021、0937962111</p>
+          </article>
+        </aside>
+
+        <section class="content-stack">
+          <article class="form-card">
+            <div class="section-heading">
+              <p class="section-heading__eyebrow">企業贊助回函</p>
+              <h2>填寫表單</h2>
+            </div>
+
+            <form id="sponsorForm" class="sponsor-form" novalidate>
+              <div class="field field--full">
+                <div class="field__label-row">
+                  <label class="field__label">方案（請擇一，方案四也可單選）</label>
+                  <p class="field__hint" id="planHint">選擇方案後會自動帶入該次應付金額。</p>
+                </div>
+                <div class="plan-selector" id="planSelector"></div>
+              </div>
+
+              <div class="field field--full">
+                <label class="field__label" for="addPlanFour">加選方案</label>
+                <label class="addon-card" id="planFourCard">
+                  <input class="addon-card__input" id="addPlanFour" name="addPlanFour" type="checkbox" />
+                  <span class="addon-card__eyebrow">可搭配主方案</span>
+                  <strong class="addon-card__title">方案四</strong>
+                  <p class="addon-card__summary">可與方案一、方案二、方案三搭配；若你已單選方案四，這裡會自動停用。</p>
+                  <ul class="addon-card__list">
+                    <li>需購買 15 張（含）以上優惠票</li>
+                    <li>320 元、480 元、640 元三種票價可混搭</li>
+                  </ul>
+                </label>
+              </div>
+
+              <div class="plan-totals">
+                <div class="plan-totals__item">
+                  <span>方案組合</span>
+                  <strong id="comboNameValue">方案一</strong>
+                </div>
+                <div class="plan-totals__item">
+                  <span>主方案金額</span>
+                  <strong id="baseAmountValue">NT$5,000</strong>
+                </div>
+                <div class="plan-totals__item">
+                  <span>優惠票總金額</span>
+                  <strong id="planFourAmountValue">NT$0</strong>
+                </div>
+                <div class="plan-totals__item">
+                  <span>本次總金額</span>
+                  <strong id="totalAmountValue">NT$5,000</strong>
+                </div>
+              </div>
+
+              <div class="ticket-builder is-hidden" id="ticketBuilder">
+                <div class="field">
+                  <label for="ticket320">320 元優惠票張數</label>
+                  <input id="ticket320" name="ticket320" type="number" min="0" step="1" value="0" inputmode="numeric" />
+                </div>
+                <div class="field">
+                  <label for="ticket480">480 元優惠票張數</label>
+                  <input id="ticket480" name="ticket480" type="number" min="0" step="1" value="0" inputmode="numeric" />
+                </div>
+                <div class="field">
+                  <label for="ticket640">640 元優惠票張數</label>
+                  <input id="ticket640" name="ticket640" type="number" min="0" step="1" value="0" inputmode="numeric" />
+                </div>
+                <p class="ticket-builder__summary" id="ticketSummary">
+                  方案四需購買 15 張（含）以上優惠票。
+                </p>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="donorName">捐款人姓名（公司名稱）</label>
+                  <input id="donorName" name="donorName" type="text" autocomplete="organization" required />
+                </div>
+
+                <div class="field">
+                  <label for="taxId">身份統一編號（或營利事業統一編號）</label>
+                  <input
+                    id="taxId"
+                    name="taxId"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="8"
+                    pattern="\d{8}"
+                    placeholder="選填，8 碼數字"
+                  />
+                </div>
+
+                <div class="field field--full">
+                  <label for="receiptAddress">收據地址</label>
+                  <textarea id="receiptAddress" name="receiptAddress" rows="3"></textarea>
+                </div>
+
+                <div class="field">
+                  <label for="contactPhone">連絡電話</label>
+                  <input
+                    id="contactPhone"
+                    name="contactPhone"
+                    type="tel"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    maxlength="10"
+                    pattern="0\d{8,9}"
+                    placeholder="例如 0912345678"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="donationAmount">本次總金額</label>
+                  <input
+                    id="donationAmount"
+                    name="donationAmount"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="系統會自動帶入本次總金額"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="transferDate">匯款日期</label>
+                  <input id="transferDate" name="transferDate" type="date" />
+                </div>
+
+                <div class="field">
+                  <label for="transferLast5">匯款帳號後五碼</label>
+                  <input
+                    id="transferLast5"
+                    name="transferLast5"
+                    type="text"
+                    maxlength="5"
+                    inputmode="numeric"
+                    pattern="\d{5}"
+                    placeholder="請填 5 碼數字"
+                  />
+                </div>
+
+                <div class="field field--full">
+                  <label for="remarks">備註</label>
+                  <textarea id="remarks" name="remarks" rows="3" placeholder="選填。可補充企業需求或合作方式。"></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="button button--primary">提交</button>
+                <button type="reset" class="button button--secondary">清空表單</button>
+              </div>
+              <p class="form-status" id="formStatus" aria-live="polite"></p>
+            </form>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
