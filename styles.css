@@ -151,7 +151,7 @@ a {
 
 .layout-grid {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: minmax(340px, 390px) minmax(0, 1fr);
   gap: 24px;
   margin-top: 24px;
 }
@@ -166,8 +166,6 @@ a {
   gap: 18px;
   align-content: start;
   align-self: start;
-  position: sticky;
-  top: 20px;
 }
 
 .info-card {
@@ -188,8 +186,49 @@ a {
   background: linear-gradient(180deg, rgba(200, 161, 96, 0.14), rgba(255, 250, 243, 0.94));
 }
 
+.info-card--story {
+  background: linear-gradient(180deg, rgba(35, 71, 61, 0.06), rgba(255, 250, 243, 0.98));
+}
+
 .info-card--note {
   background: linear-gradient(180deg, rgba(178, 93, 54, 0.12), rgba(255, 250, 243, 0.94));
+}
+
+.info-copy {
+  display: grid;
+  gap: 18px;
+}
+
+.info-copy section {
+  display: grid;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.info-copy section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.info-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.info-copy p,
+.info-copy ul {
+  margin: 0;
+}
+
+.info-copy ul {
+  padding-left: 20px;
+  color: var(--ink);
+}
+
+.info-copy li + li {
+  margin-top: 6px;
 }
 
 .info-list {
