@@ -80,6 +80,8 @@ function cacheDom() {
   dom.planFourCard = document.querySelector("#planFourCard");
   dom.ticketBuilder = document.querySelector("#ticketBuilder");
   dom.ticketSummary = document.querySelector("#ticketSummary");
+  dom.planThreeAmountField = document.querySelector("#planThreeAmountField");
+  dom.planThreeAmountHint = document.querySelector("#planThreeAmountHint");
   dom.comboNameValue = document.querySelector("#comboNameValue");
   dom.baseAmountValue = document.querySelector("#baseAmountValue");
   dom.planFourAmountValue = document.querySelector("#planFourAmountValue");
@@ -110,10 +112,12 @@ function bindEvents() {
     dom.form.elements[name].addEventListener("input", updatePlanUI);
   }
 
-  dom.form.elements.donationAmount.addEventListener("input", () => {
-    if (isFlexibleAmountPlan(getBasePlan(selectedBasePlanId))) {
-      updatePlanUI();
+  dom.form.elements.basePlanCustomAmount.addEventListener("input", (event) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) {
+      target.value = sanitizeNumericValue(target.value);
     }
+    updatePlanUI();
   });
 
   for (const [name, maxLength] of [["taxId", 8], ["contactPhone", 10], ["transferLast5", 5]]) {
@@ -150,6 +154,7 @@ function renderBasePlans() {
 function updatePlanUI() {
   const basePlan = getBasePlan(selectedBasePlanId);
   const donationAmountField = dom.form.elements.donationAmount;
+  const basePlanCustomAmountField = dom.form.elements.basePlanCustomAmount;
   const isPlanFourPrimary = basePlan.id === PLAN_FOUR.id;
   const isFlexibleAmount = isFlexibleAmountPlan(basePlan);
   const cards = dom.planSelector.querySelectorAll("[data-plan-card]");
@@ -167,21 +172,25 @@ function updatePlanUI() {
   dom.planFourCard.classList.toggle("is-selected", includePlanFour);
   dom.planFourCard.classList.toggle("is-disabled", isPlanFourPrimary);
   dom.ticketBuilder.classList.toggle("is-hidden", !shouldUsePlanFour(basePlan));
+  dom.planThreeAmountField.hidden = !isFlexibleAmount;
 
-  if (isFlexibleAmount && !wasFlexibleAmountPlan && parseAmount(donationAmountField.value) < basePlan.suggestedAmount) {
-    donationAmountField.value = "";
+  if (isFlexibleAmount && !wasFlexibleAmountPlan && parseAmount(basePlanCustomAmountField.value) === 0) {
+    basePlanCustomAmountField.value = String(basePlan.suggestedAmount);
   }
 
-  const pricing = getPlanPricing(basePlan, donationAmountField.value);
+  const pricing = getPlanPricing(basePlan, basePlanCustomAmountField.value);
 
-  donationAmountField.readOnly = !pricing.isFlexibleAmount;
-  donationAmountField.placeholder = pricing.isFlexibleAmount
-    ? `請自行填寫金額，最低 ${formatCurrency(pricing.minimumRequiredAmount)}`
-    : "系統會自動帶入本次總金額";
+  basePlanCustomAmountField.placeholder = `請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上金額`;
+  dom.planThreeAmountHint.textContent = pricing.hasPlanFour
+    ? `僅方案三使用。主方案金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}，本次總金額會自動再加上優惠票金額。`
+    : `僅方案三使用。請填寫 ${formatCurrency(basePlan.suggestedAmount)} 以上主方案金額。`;
 
   if (!pricing.isFlexibleAmount) {
-    donationAmountField.value = String(pricing.displayTotalAmount);
+    basePlanCustomAmountField.value = "";
   }
+  donationAmountField.readOnly = true;
+  donationAmountField.placeholder = "系統會自動計算本次總金額";
+  donationAmountField.value = String(pricing.displayTotalAmount);
 
   dom.comboNameValue.textContent = pricing.combinedPlanName;
   dom.baseAmountValue.textContent = formatCurrency(pricing.displayBaseAmount);
@@ -191,7 +200,9 @@ function updatePlanUI() {
   dom.planHint.textContent = pricing.isPlanFourPrimary
     ? "已單選方案四。請填寫優惠票張數，系統會自動計算該次總金額。"
     : pricing.isFlexibleAmount
-    ? `已選擇 ${pricing.combinedPlanName}。請自行填寫本次總金額，最低 ${formatCurrency(pricing.minimumRequiredAmount)}。`
+    ? pricing.hasPlanFour
+      ? `已選擇 ${pricing.combinedPlanName}。請先填寫方案三金額，最低 ${formatCurrency(basePlan.suggestedAmount)}，本次總金額會自動加上優惠票金額。`
+      : `已選擇 ${pricing.combinedPlanName}。請填寫方案三金額，最低 ${formatCurrency(basePlan.suggestedAmount)}。`
     : pricing.hasPlanFour
     ? `已選擇 ${pricing.combinedPlanName}。優惠票金額會加總到本次總金額。`
     : `已選擇 ${basePlan.name}，系統會先帶入建議金額 ${formatCurrency(basePlan.suggestedAmount)}。`;
@@ -242,13 +253,15 @@ async function handleSubmit(event) {
   const basePlan = getBasePlan(formData.get("basePlan") || selectedBasePlanId);
   const donorName = String(formData.get("donorName") || "").trim();
   const email = String(formData.get("email") || "").trim();
+  const basePlanCustomAmount = sanitizeNumericValue(formData.get("basePlanCustomAmount"));
   const taxId = sanitizeNumericValue(formData.get("taxId"), 8);
   const contactPhone = sanitizeNumericValue(formData.get("contactPhone"), 10);
   const transferLast5 = sanitizeNumericValue(formData.get("transferLast5"), 5);
-  const pricing = getPlanPricing(basePlan, formData.get("donationAmount"));
-  const donationAmount = pricing.isFlexibleAmount ? parseAmount(formData.get("donationAmount")) : pricing.minimumRequiredAmount;
+  const pricing = getPlanPricing(basePlan, basePlanCustomAmount);
+  const donationAmount = pricing.displayTotalAmount;
 
   dom.form.elements.email.value = email;
+  dom.form.elements.basePlanCustomAmount.value = basePlanCustomAmount;
   dom.form.elements.taxId.value = taxId;
   dom.form.elements.contactPhone.value = contactPhone;
   dom.form.elements.transferLast5.value = transferLast5;
@@ -277,6 +290,18 @@ async function handleSubmit(event) {
     return;
   }
 
+  if (pricing.isFlexibleAmount && !basePlanCustomAmount) {
+    setStatus("請填寫方案三金額。", "error");
+    dom.form.elements.basePlanCustomAmount.focus();
+    return;
+  }
+
+  if (pricing.isFlexibleAmount && pricing.basePlanAmount < basePlan.suggestedAmount) {
+    setStatus(`方案三金額不得低於 ${formatCurrency(basePlan.suggestedAmount)}。`, "error");
+    dom.form.elements.basePlanCustomAmount.focus();
+    return;
+  }
+
   if (!PHONE_REGEX.test(contactPhone)) {
     setStatus("連絡電話請填寫正確格式，例如 0912345678。", "error");
     dom.form.elements.contactPhone.focus();
@@ -295,15 +320,19 @@ async function handleSubmit(event) {
     return;
   }
 
-  if (!donationAmount) {
-    setStatus("請填寫本次總金額。", "error");
-    dom.form.elements.donationAmount.focus();
-    return;
-  }
-
   if (pricing.hasPlanFour && pricing.ticketSummary.totalTickets < 15) {
     setStatus(pricing.isPlanFourPrimary ? "單選方案四時，優惠票需累計至少 15 張。" : "搭配方案四時，優惠票需累計至少 15 張。", "error");
     dom.form.elements.ticket320.focus();
+    return;
+  }
+
+  if (!donationAmount) {
+    setStatus("請先完成方案內容，系統才能計算本次總金額。", "error");
+    if (pricing.isFlexibleAmount) {
+      dom.form.elements.basePlanCustomAmount.focus();
+    } else {
+      dom.form.elements.ticket320.focus();
+    }
     return;
   }
 
@@ -517,22 +546,22 @@ function getPlanPricing(basePlan, rawDonationAmount = dom.form.elements.donation
   const ticketSummary = getTicketSummary();
   const planFourAmount = hasPlanFour ? ticketSummary.totalAmount : 0;
   const minimumBaseAmount = isPlanFourPrimary ? 0 : basePlan.suggestedAmount;
-  const minimumRequiredAmount = minimumBaseAmount + planFourAmount;
-  const enteredDonationAmount = parseAmount(rawDonationAmount);
-  const displayTotalAmount = isFlexibleAmount
-    ? enteredDonationAmount || minimumRequiredAmount
-    : minimumRequiredAmount;
-  const displayBaseAmount = isPlanFourPrimary
+  const basePlanAmount = isPlanFourPrimary
     ? 0
-    : Math.max(displayTotalAmount - planFourAmount, 0);
+    : isFlexibleAmount
+      ? parseAmount(rawDonationAmount)
+      : minimumBaseAmount;
+  const minimumRequiredAmount = minimumBaseAmount + planFourAmount;
+  const displayBaseAmount = isPlanFourPrimary ? 0 : basePlanAmount;
+  const displayTotalAmount = displayBaseAmount + planFourAmount;
   const combinedPlanName = isPlanFourPrimary ? PLAN_FOUR.name : hasPlanFour ? `${basePlan.name} + ${PLAN_FOUR.name}` : basePlan.name;
 
   return {
+    basePlanAmount,
     basePlan,
     combinedPlanName,
     displayBaseAmount,
     displayTotalAmount,
-    enteredDonationAmount,
     hasPlanFour,
     isFlexibleAmount,
     isPlanFourPrimary,

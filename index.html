@@ -181,6 +181,18 @@
                   />
                 </div>
 
+                <div class="field" id="planThreeAmountField" hidden>
+                  <label for="basePlanCustomAmount">方案三金額</label>
+                  <input
+                    id="basePlanCustomAmount"
+                    name="basePlanCustomAmount"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="請填寫 NT$20,000 以上金額"
+                  />
+                  <p class="field__hint" id="planThreeAmountHint">僅方案三使用。</p>
+                </div>
+
                 <div class="field">
                   <label for="donationAmount">本次總金額</label>
                   <input
@@ -188,8 +200,8 @@
                     name="donationAmount"
                     type="text"
                     inputmode="numeric"
-                    placeholder="系統會自動帶入本次總金額"
-                    required
+                    placeholder="系統會自動計算本次總金額"
+                    readonly
                   />
                 </div>
 
