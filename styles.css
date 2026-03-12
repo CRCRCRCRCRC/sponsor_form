@@ -139,6 +139,7 @@ a {
   height: 100%;
   aspect-ratio: 21 / 8;
   object-fit: cover;
+  object-position: center top;
 }
 
 .feature-image--mobile {
