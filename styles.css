@@ -124,6 +124,32 @@ a {
   gap: 16px;
 }
 
+.feature-image {
+  margin: 24px 0 0;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.feature-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 21 / 8;
+  object-fit: cover;
+}
+
+.feature-image--mobile {
+  display: none;
+  margin-top: 6px;
+}
+
+.feature-image--desktop {
+  display: block;
+}
+
 .hero__panel-card,
 .info-card,
 .form-card,
@@ -752,6 +778,22 @@ textarea {
 
   .hero {
     gap: 18px;
+  }
+
+  .feature-image--desktop {
+    display: none;
+  }
+
+  .feature-image--mobile {
+    display: block;
+  }
+
+  .feature-image {
+    margin-top: 2px;
+  }
+
+  .feature-image img {
+    aspect-ratio: 16 / 10;
   }
 
   .hero h1 {
